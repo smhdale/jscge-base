@@ -1,0 +1,16 @@
+{
+  "name": "jscge-base",
+  "version": "0.0.1",
+  "description": "A base for creating HTML5 Canvas games.",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "webpack-dev-server --content-base dist/",
+    "build": "webpack"
+  },
+  "author": "Samuel Dale",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.4"
+  }
+}
