@@ -7,8 +7,18 @@ class Mouse {
     this.yPrev = 0
 
     this._buttons = [
-      { button: 0, down: false },
-      { button: 2, down: false }
+      {
+        button: 0,
+        down: false,
+        downListeners: [],
+        upListeners: []
+      },
+      {
+        button: 2,
+        down: false,
+        downListeners: [],
+        upListeners: []
+      }
     ]
 
     this.addEventListeners()
@@ -41,6 +51,13 @@ class Mouse {
     for (let btn of this._buttons) {
       if (evt.button === btn.button && !btn.down) {
         btn.down = true
+
+        // Run any attached listeners
+        if (btn.downListeners.length > 0) {
+          for (let fn of btn.downListeners) {
+            fn()
+          }
+        }
       }
     }
   }
@@ -48,6 +65,13 @@ class Mouse {
     for (let btn of this._buttons) {
       if (evt.button === btn.button && btn.down) {
         btn.down = false
+
+        // Run any attached listeners
+        if (btn.upListeners.length > 0) {
+          for (let fn of btn.upListeners) {
+            fn()
+          }
+        }
       }
     }
   }
@@ -60,4 +84,5 @@ class Mouse {
   }
 }
 
+// Singleton class
 module.exports = new Mouse()
