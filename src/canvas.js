@@ -6,6 +6,14 @@ class Canvas {
     this._initCanvas()
   }
 
+  get width () {
+    return this._canvas.width
+  }
+
+  get height () {
+    return this._canvas.height
+  }
+
   _initCanvas () {
     this._canvas.width = window.innerWidth
     this._canvas.height = window.innerHeight
@@ -16,7 +24,7 @@ class Canvas {
   }
 
   clear () {
-    this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height)
+    this._ctx.clearRect(0, 0, this.width, this.height)
   }
 
   // Set fill and stroke styles

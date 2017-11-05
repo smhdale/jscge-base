@@ -1,6 +1,6 @@
 import Canvas from './canvas.js'
 import GameClock from './dt.js'
-console.dir(GameClock)
+import Mouse from './mouse.js'
 
 let counter = 0
 let seconds = 0
@@ -8,16 +8,21 @@ const FPS = GameClock.fps
 const fpsArea = document.querySelector('#fps')
 
 function update () {
-  if (counter++ > FPS) {
-    counter = 0
-    seconds++
-    draw()
-  }
+  draw()
 }
 
 function draw () {
   Canvas.clear()
-  Canvas.rect(seconds, seconds, 50, 50, '#f00')
+
+  let side = 50
+  Canvas.rect(Mouse.x - side/2, Mouse.y - side/2, side, side, '#f00')
+
+  if (Mouse.leftDown) {
+    Canvas.rect(Mouse.x - side/2, Mouse.y - side/2, side/2, side/2, '#0f0')
+  }
+  if (Mouse.rightDown) {
+    Canvas.rect(Mouse.x, Mouse.y, side/2, side/2, '#00f')
+  }
 }
 
 draw()
