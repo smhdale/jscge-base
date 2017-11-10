@@ -1,22 +1,35 @@
-import Canvas from './canvas.js'
-import GameClock from './dt.js'
-import Mouse from './mouse.js'
-import Keyboard from './keyboard.js'
+// Control imports
+import Canvas from './canvas'
+import GameClock from './dt'
+import Mouse from './mouse'
+import Keyboard from './keyboard'
+
+// Instance imports
+import Line from './objects/line'
 
 let counter = 0
 let seconds = 0
 const FPS = GameClock.fps
 const fpsArea = document.querySelector('#fps')
 
+let drawGreen = false
+let drawBlue = false
+let lines = []
+
 function update () {
+  Mouse.update()
+
+  // Update all instances
+  //InstanceManager.updateAll()
+  for (let line of lines) {
+    line.update()
+  }
   draw()
 }
 
-let drawGreen = false
-let drawBlue = false
-
 Mouse.onLeftDown(() => {
   drawGreen = true
+  lines.push(new Line())
 })
 Mouse.onLeftUp(() => {
   drawGreen = false
@@ -32,6 +45,10 @@ Keyboard.onKeyUp('space', () => {
 function draw () {
   Canvas.clear()
 
+  for (let line of lines) {
+    line.draw()
+  }
+
   let side = 50
   Canvas.rect(Mouse.x - side/2, Mouse.y - side/2, side, side, '#f00')
 
@@ -41,6 +58,8 @@ function draw () {
   if (drawBlue) {
     Canvas.rect(Mouse.x, Mouse.y, side/2, side/2, '#00f')
   }
+
+  //InstanceManager.drawAll()
 }
 
 draw()

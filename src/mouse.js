@@ -33,10 +33,15 @@ class jscge_Mouse extends ButtonMap {
 
   // Tracking mouse position
   _setPos (evt) {
-    this.xPrev = this.x
-    this.yPrev = this.y
     this.x = evt.clientX
     this.y = evt.clientY
+  }
+
+  update () {
+    if (this.xPrev !== this.x || this.yPrev !== this.y) {
+      this.xPrev = this.x
+      this.yPrev = this.y
+    }
   }
 
   _addEventListeners () {

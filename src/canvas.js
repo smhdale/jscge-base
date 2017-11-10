@@ -38,8 +38,8 @@ class Canvas {
   // Drawing functions
 
   // Line
-  line (x1, y1, x2, y2, stroke) {
-    this._setStroke(stroke)
+  line (x1, y1, x2, y2, strokeCol) {
+    this._setStroke(strokeCol)
     this._ctx.beginPath()
     this._ctx.moveTo(x1, y1)
     this._ctx.lineTo(x2, y2)
@@ -47,16 +47,16 @@ class Canvas {
   }
 
   // Rectangle
-  rect (x, y, w, h, fill = '#000', stroke = null) {
+  rect (x, y, w, h, fillCol = '#000', strokeCol = null) {
     // Handle fill
-    if (fill) {
-      this._setFill(fill)
+    if (fillCol) {
+      this._setFill(fillCol)
       this._ctx.fillRect(x, y, w, h)
     }
 
     // Handle stroke
-    if (stroke) {
-      this._setStroke(stroke)
+    if (strokeCol) {
+      this._setStroke(strokeCol)
       this._ctx.strokeRect(x, y, w, h)
     }
   }
