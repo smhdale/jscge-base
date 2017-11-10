@@ -63,4 +63,4 @@ class Canvas {
 }
 
 // Singleton class
-module.exports = new Canvas()
+export default new Canvas()

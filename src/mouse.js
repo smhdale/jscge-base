@@ -1,27 +1,20 @@
-class Mouse {
+import ButtonMap from './buttonmap'
+
+class jscge_Mouse extends ButtonMap {
   constructor () {
+    super()
     this.x = 0
     this.y = 0
 
     this.xPrev = 0
     this.yPrev = 0
 
-    this._buttons = [
-      {
-        button: 0,
-        down: false,
-        downListeners: [],
-        upListeners: []
-      },
-      {
-        button: 2,
-        down: false,
-        downListeners: [],
-        upListeners: []
-      }
-    ]
+    this._buttonNames = {
+      'left': 0,
+      'right': 2
+    }
 
-    this.addEventListeners()
+    this._addEventListeners()
   }
 
   get dx () {
@@ -32,10 +25,10 @@ class Mouse {
   }
 
   get leftDown () {
-    return this._buttons.find(btn => btn.button === 0).down
+    return this
   }
   get rightDown () {
-    return this._buttons.find(btn => btn.button === 2).down
+    return this.checkPressed(this._buttonNames.right)
   }
 
   // Tracking mouse position
@@ -46,43 +39,31 @@ class Mouse {
     this.y = evt.clientY
   }
 
-  // For tracking whether a mouse button is pressed
-  _handleButtonDown (evt) {
-    for (let btn of this._buttons) {
-      if (evt.button === btn.button && !btn.down) {
-        btn.down = true
-
-        // Run any attached listeners
-        if (btn.downListeners.length > 0) {
-          for (let fn of btn.downListeners) {
-            fn()
-          }
-        }
-      }
-    }
-  }
-  _handleButtonUp (evt) {
-    for (let btn of this._buttons) {
-      if (evt.button === btn.button && btn.down) {
-        btn.down = false
-
-        // Run any attached listeners
-        if (btn.upListeners.length > 0) {
-          for (let fn of btn.upListeners) {
-            fn()
-          }
-        }
-      }
-    }
-  }
-
-  addEventListeners () {
+  _addEventListeners () {
     window.addEventListener('mousemove', this._setPos.bind(this))
-    window.addEventListener('mousedown', this._handleButtonDown.bind(this))
-    window.addEventListener('mouseup', this._handleButtonUp.bind(this))
+    window.addEventListener('mousedown', e => this._handleButtonDown(e.button))
+    window.addEventListener('mouseup', e => this._handleButtonUp(e.button))
     window.addEventListener('contextmenu', evt => evt.preventDefault())
+  }
+
+  // PUBLIC METHODS
+
+  // For adding callbacks to left mouse button
+  onLeftDown (callback) {
+    this._addDownEvent(this._buttonNames.left, callback)
+  }
+  onLeftUp (callback) {
+    this._addUpEvent(this._buttonNames.left, callback)
+  }
+
+  // For adding callbacks to right mouse button
+  onRightDown (callback) {
+    this._addDownEvent(this._buttonNames.right, callback)
+  }
+  onRightDown (callback) {
+    this._addUpEvent(this._buttonNames.right, callback)
   }
 }
 
 // Singleton class
-module.exports = new Mouse()
+export default new jscge_Mouse()

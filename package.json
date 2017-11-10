@@ -10,6 +10,7 @@
   "author": "Samuel Dale",
   "license": "ISC",
   "devDependencies": {
+    "keycode": "^2.1.9",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.4"
   }

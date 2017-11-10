@@ -56,4 +56,4 @@ class DeltaTime {
 }
 
 // Singleton class
-module.exports = new DeltaTime()
+export default new DeltaTime()
