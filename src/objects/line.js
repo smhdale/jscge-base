@@ -7,10 +7,11 @@ class Line {
     this.points = []
     this.threshold = 2
     this.drawing = true
+    this.thick = false
 
     // Methods
     this.addPoint = function () {
-      this.points.push({ x: Mouse.x, y: Mouse.y })
+      this.points.push({ x: Mouse.x, y: Mouse.y, thick: Mouse.rightDown })
     }
     this.getLatestPoint = () => this.points[this.points.length - 1]
     this.distBetween = function (x1, y1, x2, y2) {
@@ -42,6 +43,7 @@ class Line {
       for (let i = 1; i < numPoints; i++) {
         let p1 = this.points[i-1]
         let p2 = this.points[i]
+        Canvas.lineWidth = 1 + 3*this.points[i].thick
         Canvas.line(p1.x, p1.y, p2.x, p2.y, '#000')
       }
     }

@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -68,48 +68,6 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__canvas_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__canvas_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__canvas_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dt_js__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dt_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__dt_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mouse_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mouse_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__mouse_js__);
-
-
-
-
-let counter = 0
-let seconds = 0
-const FPS = __WEBPACK_IMPORTED_MODULE_1__dt_js___default.a.fps
-const fpsArea = document.querySelector('#fps')
-
-function update () {
-  draw()
-}
-
-function draw () {
-  __WEBPACK_IMPORTED_MODULE_0__canvas_js___default.a.clear()
-
-  let side = 50
-  __WEBPACK_IMPORTED_MODULE_0__canvas_js___default.a.rect(__WEBPACK_IMPORTED_MODULE_2__mouse_js___default.a.x - side/2, __WEBPACK_IMPORTED_MODULE_2__mouse_js___default.a.y - side/2, side, side, '#f00')
-
-  if (__WEBPACK_IMPORTED_MODULE_2__mouse_js___default.a.leftDown) {
-    __WEBPACK_IMPORTED_MODULE_0__canvas_js___default.a.rect(__WEBPACK_IMPORTED_MODULE_2__mouse_js___default.a.x - side/2, __WEBPACK_IMPORTED_MODULE_2__mouse_js___default.a.y - side/2, side/2, side/2, '#0f0')
-  }
-  if (__WEBPACK_IMPORTED_MODULE_2__mouse_js___default.a.rightDown) {
-    __WEBPACK_IMPORTED_MODULE_0__canvas_js___default.a.rect(__WEBPACK_IMPORTED_MODULE_2__mouse_js___default.a.x, __WEBPACK_IMPORTED_MODULE_2__mouse_js___default.a.y, side/2, side/2, '#00f')
-  }
-}
-
-draw()
-__WEBPACK_IMPORTED_MODULE_1__dt_js___default.a.start(update)
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
 class Canvas {
   constructor () {
     this._canvas = document.createElement('canvas')
@@ -150,8 +108,8 @@ class Canvas {
   // Drawing functions
 
   // Line
-  line (x1, y1, x2, y2, stroke) {
-    this._setStroke(stroke)
+  line (x1, y1, x2, y2, strokeCol) {
+    this._setStroke(strokeCol)
     this._ctx.beginPath()
     this._ctx.moveTo(x1, y1)
     this._ctx.lineTo(x2, y2)
@@ -159,29 +117,305 @@ class Canvas {
   }
 
   // Rectangle
-  rect (x, y, w, h, fill = '#000', stroke = null) {
+  rect (x, y, w, h, fillCol = '#000', strokeCol = null) {
     // Handle fill
-    if (fill) {
-      this._setFill(fill)
+    if (fillCol) {
+      this._setFill(fillCol)
       this._ctx.fillRect(x, y, w, h)
     }
 
     // Handle stroke
-    if (stroke) {
-      this._setStroke(stroke)
+    if (strokeCol) {
+      this._setStroke(strokeCol)
       this._ctx.strokeRect(x, y, w, h)
     }
   }
 }
 
 // Singleton class
-module.exports = new Canvas()
+/* harmony default export */ __webpack_exports__["a"] = (new Canvas());
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__buttonmap__ = __webpack_require__(2);
+
+
+class jscge_Mouse extends __WEBPACK_IMPORTED_MODULE_0__buttonmap__["a" /* default */] {
+  constructor () {
+    super()
+    this.x = 0
+    this.y = 0
+
+    this.xPrev = 0
+    this.yPrev = 0
+
+    this._buttonNames = {
+      'left': 0,
+      'right': 2
+    }
+
+    this._addEventListeners()
+  }
+
+  get dx () {
+    return this.x - this.xPrev
+  }
+  get dy () {
+    return this.y - this.yPrev
+  }
+
+  get leftDown () {
+    return this
+  }
+  get rightDown () {
+    return this.checkPressed(this._buttonNames.right)
+  }
+
+  // Tracking mouse position
+  _setPos (evt) {
+    this.x = evt.clientX
+    this.y = evt.clientY
+  }
+
+  update () {
+    if (this.xPrev !== this.x || this.yPrev !== this.y) {
+      this.xPrev = this.x
+      this.yPrev = this.y
+    }
+  }
+
+  _addEventListeners () {
+    window.addEventListener('mousemove', this._setPos.bind(this))
+    window.addEventListener('mousedown', e => this._handleButtonDown(e.button))
+    window.addEventListener('mouseup', e => this._handleButtonUp(e.button))
+    window.addEventListener('contextmenu', evt => evt.preventDefault())
+  }
+
+  // PUBLIC METHODS
+
+  // For adding callbacks to left mouse button
+  onLeftDown (callback) {
+    this._addDownEvent(this._buttonNames.left, callback)
+  }
+  onLeftUp (callback) {
+    this._addUpEvent(this._buttonNames.left, callback)
+  }
+
+  // For adding callbacks to right mouse button
+  onRightDown (callback) {
+    this._addDownEvent(this._buttonNames.right, callback)
+  }
+  onRightDown (callback) {
+    this._addUpEvent(this._buttonNames.right, callback)
+  }
+}
+
+// Singleton class
+/* harmony default export */ __webpack_exports__["a"] = (new jscge_Mouse());
 
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+/**
+ * Simple button class
+ */
+
+class jscge_Button {
+  constructor (id) {
+    this.button = id
+    this.down = false
+    this._downEvents = []
+    this._upEvents = []
+  }
+
+  // Add an event
+  addDownEvent (callback) {
+    this._downEvents.push(callback)
+  }
+  addUpEvent (callback) {
+    this._upEvents.push(callback)
+  }
+
+  // Run all events bound to button up/down
+  press () {
+    this.down = true
+    for (let fn of this._downEvents) {
+      fn()
+    }
+  }
+  release () {
+    this.down = false
+    for (let fn of this._upEvents) {
+      fn()
+    }
+  }
+}
+
+/**
+ * Class for keeping track of multiple button states
+ * and applying event listeners to press & release events
+ */
+
+class jscge_ButtonMap {
+  constructor () {
+    this._buttons = []
+  }
+
+  // PRIVATE METHODS
+
+  // Gets a button from the map
+  // Returns undefined if it doesn't exist
+  _getButton (button) {
+    return this._buttons.find(_ => _.button === button)
+  }
+
+  // Adds a button to the button map and return it
+  _addButton (button) {
+    const newButton = new jscge_Button(button)
+    this._buttons.push(newButton)
+    return newButton
+  }
+
+  // Add to map if undefined
+  _getOrAddButton (button) {
+    const b = this._getButton(button)
+    if (b) {
+      return b
+    }
+    return this._addButton(button)
+  }
+
+  // Handle button press
+  _handleButtonDown (button) {
+    const b = this._getOrAddButton(button)
+    if (!b.down) {
+      b.press()
+    }
+  }
+
+  // Handle button release
+  _handleButtonUp (button) {
+    const b = this._getOrAddButton(button)
+    if (b.down) {
+      b.release()
+    }
+  }
+
+  // Add a callback event to button press
+  _addDownEvent (button, callback) {
+    let b = this._getOrAddButton(button)
+    b.addDownEvent(callback)
+  }
+
+  // Add a callback event to button release
+  _addUpEvent (button, callback) {
+    let b = this._getOrAddButton(button)
+    b.addUpEvent(callback)
+  }
+
+  // PUBLIC METHODS
+
+  // Checks if a button is pressed
+  checkPressed (button) {
+    const b = this._getOrAddButton(button)
+    return b.down
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (jscge_ButtonMap);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__canvas__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dt__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mouse__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__keyboard__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__objects_line__ = __webpack_require__(7);
+// Control imports
+
+
+
+
+
+// Instance imports
+
+
+let counter = 0
+let seconds = 0
+const FPS = __WEBPACK_IMPORTED_MODULE_1__dt__["a" /* default */].fps
+const fpsArea = document.querySelector('#fps')
+
+let drawGreen = false
+let drawBlue = false
+let lines = []
+
+function update () {
+  __WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].update()
+
+  // Update all instances
+  //InstanceManager.updateAll()
+  for (let line of lines) {
+    line.update()
+  }
+  draw()
+}
+
+__WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].onLeftDown(() => {
+  drawGreen = true
+  lines.push(new __WEBPACK_IMPORTED_MODULE_4__objects_line__["a" /* default */]())
+})
+__WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].onLeftUp(() => {
+  drawGreen = false
+})
+
+__WEBPACK_IMPORTED_MODULE_3__keyboard__["a" /* default */].onKeyDown('space', () => {
+  drawBlue = true
+})
+__WEBPACK_IMPORTED_MODULE_3__keyboard__["a" /* default */].onKeyUp('space', () => {
+  drawBlue = false
+})
+
+function draw () {
+  __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].clear()
+
+  for (let line of lines) {
+    line.draw()
+  }
+
+  let side = 50
+  __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].rect(__WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].x - side/2, __WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].y - side/2, side, side, '#f00')
+
+  if (drawGreen) {
+    __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].rect(__WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].x - side/2, __WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].y - side/2, side/2, side/2, '#0f0')
+  }
+  if (drawBlue) {
+    __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].rect(__WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].x, __WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].y, side/2, side/2, '#00f')
+  }
+
+  //InstanceManager.drawAll()
+}
+
+draw()
+__WEBPACK_IMPORTED_MODULE_1__dt__["a" /* default */].start(update)
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 class DeltaTime {
   constructor (fps = 60) {
     this.fps = fps
@@ -240,120 +474,65 @@ class DeltaTime {
 }
 
 // Singleton class
-module.exports = new DeltaTime()
+/* harmony default export */ __webpack_exports__["a"] = (new DeltaTime());
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const keycode = __webpack_require__(4)
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__buttonmap__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_keycode__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_keycode___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_keycode__);
 
-class Mouse {
+
+
+class jscge_Keyboard extends __WEBPACK_IMPORTED_MODULE_0__buttonmap__["a" /* default */] {
   constructor () {
-    this.x = 0
-    this.y = 0
+    super()
+    this._addEventListeners()
+  }
 
-    this.xPrev = 0
-    this.yPrev = 0
-
-    this._buttons = [
-      {
-        button: 0,
-        down: false,
-        downListeners: [],
-        upListeners: []
-      },
-      {
-        button: 2,
-        down: false,
-        downListeners: [],
-        upListeners: []
+  _parseKey (key) {
+    if (typeof key === 'string') {
+      // If key is string, convert it to keycode
+      let keyCode = __WEBPACK_IMPORTED_MODULE_1_keycode___default()(key)
+      if (keyCode === undefined) {
+        throw new TypeError(`The specified key does not exist: ${key}`)
       }
-    ]
-
-    const _buttonNames = {
-      'left': 0,
-      'right': 2
-    }
-
-    this.addEventListeners()
-  }
-
-  get dx () {
-    return this.x - this.xPrev
-  }
-  get dy () {
-    return this.y - this.yPrev
-  }
-
-  get leftDown () {
-    return this._buttons.find(btn => btn.button === 0).down
-  }
-  get rightDown () {
-    return this._buttons.find(btn => btn.button === 2).down
-  }
-
-  // Checks if a button is mapped
-  _checkMapped (btnCheck) {
-    if (this._buttons.find(btn => btn.button === btnCheck) === undefined) {
-      // Button doesnt exist in our button map
-      
+      return keyCode
+    } else if (typeof key === 'number') {
+      // User used keyCode directly
+      return key
+    } else {
+      // Argument error
+      throw new TypeError('Key must be either string or integer keyCode')
     }
   }
 
-  // Tracking mouse position
-  _setPos (evt) {
-    this.xPrev = this.x
-    this.yPrev = this.y
-    this.x = evt.clientX
-    this.y = evt.clientY
+  onKeyDown (key, callback) {
+    let keyCode = this._parseKey(key)
+    this._addDownEvent(keyCode, callback)
   }
 
-  // For tracking whether a mouse button is pressed
-  _handleButtonDown (evt) {
-    for (let btn of this._buttons) {
-      if (evt.button === btn.button && !btn.down) {
-        btn.down = true
-
-        // Run any attached listeners
-        if (btn.downListeners.length > 0) {
-          for (let fn of btn.downListeners) {
-            fn()
-          }
-        }
-      }
-    }
-  }
-  _handleButtonUp (evt) {
-    for (let btn of this._buttons) {
-      if (evt.button === btn.button && btn.down) {
-        btn.down = false
-
-        // Run any attached listeners
-        if (btn.upListeners.length > 0) {
-          for (let fn of btn.upListeners) {
-            fn()
-          }
-        }
-      }
-    }
+  onKeyUp (key, callback) {
+    let keyCode = this._parseKey(key)
+    this._addUpEvent(keyCode, callback)
   }
 
-  addEventListeners () {
-    window.addEventListener('mousemove', this._setPos.bind(this))
-    window.addEventListener('mousedown', this._handleButtonDown.bind(this))
-    window.addEventListener('mouseup', this._handleButtonUp.bind(this))
-    window.addEventListener('contextmenu', evt => evt.preventDefault())
+  _addEventListeners () {
+    window.addEventListener('keydown', e => this._handleButtonDown(e.keyCode))
+    window.addEventListener('keyup', e => this._handleButtonUp(e.keyCode))
   }
 }
 
 // Singleton class
-module.exports = new Mouse()
+/* harmony default export */ __webpack_exports__["a"] = (new jscge_Keyboard());
 
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports) {
 
 // Source: http://jsfiddle.net/vWx8V/
@@ -502,6 +681,66 @@ for (i in codes) names[codes[i]] = i
 for (var alias in aliases) {
   codes[alias] = aliases[alias]
 }
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__canvas__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mouse__ = __webpack_require__(1);
+
+
+
+class Line {
+  constructor () {
+    // Props
+    this.points = []
+    this.threshold = 2
+    this.drawing = true
+
+    // Methods
+    this.addPoint = function () {
+      this.points.push({ x: __WEBPACK_IMPORTED_MODULE_1__mouse__["a" /* default */].x, y: __WEBPACK_IMPORTED_MODULE_1__mouse__["a" /* default */].y })
+    }
+    this.getLatestPoint = () => this.points[this.points.length - 1]
+    this.distBetween = function (x1, y1, x2, y2) {
+      return Math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    }
+
+    // Mouse & KB bindings
+    __WEBPACK_IMPORTED_MODULE_1__mouse__["a" /* default */].onLeftUp(() => {
+      this.drawing = false
+    })
+  }
+
+  update () {
+    if (this.drawing) {
+      if (this.points.length === 0) {
+        this.addPoint()
+      } else {
+        let latest = this.getLatestPoint()
+        if (this.distBetween(latest.x, latest.y, __WEBPACK_IMPORTED_MODULE_1__mouse__["a" /* default */].x, __WEBPACK_IMPORTED_MODULE_1__mouse__["a" /* default */].y) > this.threshold) {
+          this.addPoint()
+        }
+      }
+    }
+  }
+
+  draw () {
+    let numPoints = this.points.length
+    if (numPoints > 1) {
+      for (let i = 1; i < numPoints; i++) {
+        let p1 = this.points[i-1]
+        let p2 = this.points[i]
+        __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].line(p1.x, p1.y, p2.x, p2.y, '#000')
+      }
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Line);
 
 
 /***/ })

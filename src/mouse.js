@@ -65,7 +65,7 @@ class jscge_Mouse extends ButtonMap {
   onRightDown (callback) {
     this._addDownEvent(this._buttonNames.right, callback)
   }
-  onRightDown (callback) {
+  onRightUp (callback) {
     this._addUpEvent(this._buttonNames.right, callback)
   }
 }

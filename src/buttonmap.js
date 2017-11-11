@@ -40,7 +40,7 @@ class jscge_Button {
 
 class jscge_ButtonMap {
   constructor () {
-    this._buttons = []
+    this._buttons = {}
   }
 
   // PRIVATE METHODS
@@ -48,13 +48,16 @@ class jscge_ButtonMap {
   // Gets a button from the map
   // Returns undefined if it doesn't exist
   _getButton (button) {
-    return this._buttons.find(_ => _.button === button)
+    if (this._buttons.hasOwnProperty(button)) {
+      return this._buttons[button]
+    }
+    return undefined
   }
 
   // Adds a button to the button map and return it
   _addButton (button) {
     const newButton = new jscge_Button(button)
-    this._buttons.push(newButton)
+    this._buttons[button] = newButton
     return newButton
   }
 
