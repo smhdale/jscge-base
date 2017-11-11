@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -74,16 +74,24 @@ class Canvas {
     this._ctx = this._canvas.getContext('2d')
 
     this._initCanvas()
+
+    this._transparentColours = /^(transparent|rgba\(\d+ ?, ?\d+ ?, ?\d+ ?, ?0\)|hsla\(\d+ ?, ?\d+ ?, ?\d+ ?, ?0\))$/
+
+    // Canvas defaults
+    this.fillStyle = '#000'
+    this.strokeStyle = '#000'
+    this.lineWidth = 0
   }
 
+  // Canvas props
   get width () {
     return this._canvas.width
   }
-
   get height () {
     return this._canvas.height
   }
 
+  // Set up canvas and add to DOM
   _initCanvas () {
     this._canvas.width = window.innerWidth
     this._canvas.height = window.innerHeight
@@ -93,42 +101,18 @@ class Canvas {
     document.body.appendChild(this._canvas)
   }
 
+  colourVisible (col) {
+    return (col && !this._transparentColours.test(col))
+  }
+
+  // Get canvas context for fine-grained drawing control
+  getContext () {
+    return this._ctx
+  }
+
+  // Clear canvas, called automatically at start of every draw
   clear () {
     this._ctx.clearRect(0, 0, this.width, this.height)
-  }
-
-  // Set fill and stroke styles
-  _setFill (col) {
-    this._ctx.fillStyle = col
-  }
-  _setStroke (col) {
-    this._ctx.strokeStyle = col
-  }
-
-  // Drawing functions
-
-  // Line
-  line (x1, y1, x2, y2, strokeCol) {
-    this._setStroke(strokeCol)
-    this._ctx.beginPath()
-    this._ctx.moveTo(x1, y1)
-    this._ctx.lineTo(x2, y2)
-    this._ctx.stroke()
-  }
-
-  // Rectangle
-  rect (x, y, w, h, fillCol = '#000', strokeCol = null) {
-    // Handle fill
-    if (fillCol) {
-      this._setFill(fillCol)
-      this._ctx.fillRect(x, y, w, h)
-    }
-
-    // Handle stroke
-    if (strokeCol) {
-      this._setStroke(strokeCol)
-      this._ctx.strokeRect(x, y, w, h)
-    }
   }
 }
 
@@ -209,7 +193,7 @@ class jscge_Mouse extends __WEBPACK_IMPORTED_MODULE_0__buttonmap__["a" /* defaul
   onRightDown (callback) {
     this._addDownEvent(this._buttonNames.right, callback)
   }
-  onRightDown (callback) {
+  onRightUp (callback) {
     this._addUpEvent(this._buttonNames.right, callback)
   }
 }
@@ -265,7 +249,7 @@ class jscge_Button {
 
 class jscge_ButtonMap {
   constructor () {
-    this._buttons = []
+    this._buttons = {}
   }
 
   // PRIVATE METHODS
@@ -273,13 +257,16 @@ class jscge_ButtonMap {
   // Gets a button from the map
   // Returns undefined if it doesn't exist
   _getButton (button) {
-    return this._buttons.find(_ => _.button === button)
+    if (this._buttons.hasOwnProperty(button)) {
+      return this._buttons[button]
+    }
+    return undefined
   }
 
   // Adds a button to the button map and return it
   _addButton (button) {
     const newButton = new jscge_Button(button)
-    this._buttons.push(newButton)
+    this._buttons[button] = newButton
     return newButton
   }
 
@@ -337,12 +324,161 @@ class jscge_ButtonMap {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__buttonmap__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_keycode__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_keycode___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_keycode__);
+
+
+
+class jscge_Keyboard extends __WEBPACK_IMPORTED_MODULE_0__buttonmap__["a" /* default */] {
+  constructor () {
+    super()
+    this._addEventListeners()
+  }
+
+  _parseKey (key) {
+    if (typeof key === 'string') {
+      // If key is string, convert it to keycode
+      let keyCode = __WEBPACK_IMPORTED_MODULE_1_keycode___default()(key)
+      if (keyCode === undefined) {
+        throw new TypeError(`The specified key does not exist: ${key}`)
+      }
+      return keyCode
+    } else if (typeof key === 'number') {
+      // User used keyCode directly
+      return key
+    } else {
+      // Argument error
+      throw new TypeError('Key must be either string or integer keyCode')
+    }
+  }
+
+  onKeyDown (key, callback) {
+    let keyCode = this._parseKey(key)
+    this._addDownEvent(keyCode, callback)
+  }
+
+  onKeyUp (key, callback) {
+    let keyCode = this._parseKey(key)
+    this._addUpEvent(keyCode, callback)
+  }
+
+  _addEventListeners () {
+    window.addEventListener('keydown', e => this._handleButtonDown(e.keyCode))
+    window.addEventListener('keyup', e => this._handleButtonUp(e.keyCode))
+  }
+}
+
+// Singleton class
+/* harmony default export */ __webpack_exports__["a"] = (new jscge_Keyboard());
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function distBetween (x1, y1, x2, y2) {
+  return Math.sqrt((x2 - x1) ** 2, (y2 - y1) ** 2)
+}
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  distBetween
+});
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__line__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rect__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__path__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__spline__ = __webpack_require__(13);
+/* unused harmony reexport Line */
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__rect__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__path__["a"]; });
+/* unused harmony reexport Spline */
+
+
+
+
+
+
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__canvas__ = __webpack_require__(0);
+
+
+// Basically a long line that points can be added to
+
+class Path {
+  constructor (x, y, strokeStyle = '#000', lineWidth = 1) {
+    this.strokeStyle = strokeStyle
+    this.lineWidth = lineWidth
+
+    this.points = []
+    this.addPoint(x, y)
+  }
+
+  get numPoints () {
+    return this.points.length
+  }
+
+  addPoint (x, y) {
+    this.points.push({
+      x: x,
+      y: y
+    })
+  }
+
+  _drawLine () {
+    let ctx = __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].getContext()
+
+    ctx.beginPath()
+    ctx.moveTo(this.points[0].x, this.points[0].y)
+    for (let i = 1; i < this.points.length; i++) {
+      let p = this.points[i]
+      ctx.lineTo(p.x, p.y)
+    }
+    ctx.stroke()
+  }
+
+  draw () {
+    if (this.numPoints > 1) {
+      let ctx = __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].getContext()
+
+      // Line style
+      ctx.strokeStyle = this.strokeStyle
+      ctx.lineWidth = this.lineWidth
+
+      // Draw path
+      this._drawLine()
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Path);
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__canvas__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dt__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dt__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mouse__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__keyboard__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__objects_line__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__keyboard__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__objects_paint__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__objects_mousetrack__ = __webpack_require__(14);
 // Control imports
 
 
@@ -352,14 +488,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // Instance imports
 
 
+
 let counter = 0
 let seconds = 0
 const FPS = __WEBPACK_IMPORTED_MODULE_1__dt__["a" /* default */].fps
 const fpsArea = document.querySelector('#fps')
 
-let drawGreen = false
-let drawBlue = false
 let lines = []
+const mouseTracker = new __WEBPACK_IMPORTED_MODULE_5__objects_mousetrack__["a" /* default */]()
+
+__WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].onLeftDown(() => {
+  lines.push(new __WEBPACK_IMPORTED_MODULE_4__objects_paint__["a" /* default */]())
+})
 
 function update () {
   __WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].update()
@@ -369,42 +509,21 @@ function update () {
   for (let line of lines) {
     line.update()
   }
+
+  mouseTracker.update()
+
   draw()
 }
-
-__WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].onLeftDown(() => {
-  drawGreen = true
-  lines.push(new __WEBPACK_IMPORTED_MODULE_4__objects_line__["a" /* default */]())
-})
-__WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].onLeftUp(() => {
-  drawGreen = false
-})
-
-__WEBPACK_IMPORTED_MODULE_3__keyboard__["a" /* default */].onKeyDown('space', () => {
-  drawBlue = true
-})
-__WEBPACK_IMPORTED_MODULE_3__keyboard__["a" /* default */].onKeyUp('space', () => {
-  drawBlue = false
-})
 
 function draw () {
   __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].clear()
 
+  //InstanceManager.drawAll()
   for (let line of lines) {
     line.draw()
   }
 
-  let side = 50
-  __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].rect(__WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].x - side/2, __WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].y - side/2, side, side, '#f00')
-
-  if (drawGreen) {
-    __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].rect(__WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].x - side/2, __WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].y - side/2, side/2, side/2, '#0f0')
-  }
-  if (drawBlue) {
-    __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].rect(__WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].x, __WEBPACK_IMPORTED_MODULE_2__mouse__["a" /* default */].y, side/2, side/2, '#00f')
-  }
-
-  //InstanceManager.drawAll()
+  mouseTracker.draw()
 }
 
 draw()
@@ -412,7 +531,7 @@ __WEBPACK_IMPORTED_MODULE_1__dt__["a" /* default */].start(update)
 
 
 /***/ }),
-/* 4 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -478,61 +597,7 @@ class DeltaTime {
 
 
 /***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__buttonmap__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_keycode__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_keycode___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_keycode__);
-
-
-
-class jscge_Keyboard extends __WEBPACK_IMPORTED_MODULE_0__buttonmap__["a" /* default */] {
-  constructor () {
-    super()
-    this._addEventListeners()
-  }
-
-  _parseKey (key) {
-    if (typeof key === 'string') {
-      // If key is string, convert it to keycode
-      let keyCode = __WEBPACK_IMPORTED_MODULE_1_keycode___default()(key)
-      if (keyCode === undefined) {
-        throw new TypeError(`The specified key does not exist: ${key}`)
-      }
-      return keyCode
-    } else if (typeof key === 'number') {
-      // User used keyCode directly
-      return key
-    } else {
-      // Argument error
-      throw new TypeError('Key must be either string or integer keyCode')
-    }
-  }
-
-  onKeyDown (key, callback) {
-    let keyCode = this._parseKey(key)
-    this._addDownEvent(keyCode, callback)
-  }
-
-  onKeyUp (key, callback) {
-    let keyCode = this._parseKey(key)
-    this._addUpEvent(keyCode, callback)
-  }
-
-  _addEventListeners () {
-    window.addEventListener('keydown', e => this._handleButtonDown(e.keyCode))
-    window.addEventListener('keyup', e => this._handleButtonUp(e.keyCode))
-  }
-}
-
-// Singleton class
-/* harmony default export */ __webpack_exports__["a"] = (new jscge_Keyboard());
-
-
-/***/ }),
-/* 6 */
+/* 9 */
 /***/ (function(module, exports) {
 
 // Source: http://jsfiddle.net/vWx8V/
@@ -684,63 +749,299 @@ for (var alias in aliases) {
 
 
 /***/ }),
-/* 7 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__canvas__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mouse__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mouse__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__trig__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shapes_index__ = __webpack_require__(5);
 
 
 
-class Line {
+
+class Paint {
   constructor () {
     // Props
-    this.points = []
+    this.path = new __WEBPACK_IMPORTED_MODULE_2__shapes_index__["a" /* Path */](__WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].x, __WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].y)
     this.threshold = 2
     this.drawing = true
 
     // Methods
     this.addPoint = function () {
-      this.points.push({ x: __WEBPACK_IMPORTED_MODULE_1__mouse__["a" /* default */].x, y: __WEBPACK_IMPORTED_MODULE_1__mouse__["a" /* default */].y })
+      this.path.addPoint(__WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].x, __WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].y)
     }
-    this.getLatestPoint = () => this.points[this.points.length - 1]
-    this.distBetween = function (x1, y1, x2, y2) {
-      return Math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    this.getLatestPoint = function () {
+      return this.path.points[this.path.numPoints - 1]
     }
 
     // Mouse & KB bindings
-    __WEBPACK_IMPORTED_MODULE_1__mouse__["a" /* default */].onLeftUp(() => {
+    __WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].onLeftUp(() => {
       this.drawing = false
     })
   }
 
   update () {
     if (this.drawing) {
-      if (this.points.length === 0) {
+      let latest = this.getLatestPoint()
+      if (__WEBPACK_IMPORTED_MODULE_1__trig__["a" /* default */].distBetween(latest.x, latest.y, __WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].x, __WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].y) > this.threshold) {
         this.addPoint()
-      } else {
-        let latest = this.getLatestPoint()
-        if (this.distBetween(latest.x, latest.y, __WEBPACK_IMPORTED_MODULE_1__mouse__["a" /* default */].x, __WEBPACK_IMPORTED_MODULE_1__mouse__["a" /* default */].y) > this.threshold) {
-          this.addPoint()
-        }
       }
     }
   }
 
   draw () {
-    let numPoints = this.points.length
-    if (numPoints > 1) {
-      for (let i = 1; i < numPoints; i++) {
-        let p1 = this.points[i-1]
-        let p2 = this.points[i]
-        __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].line(p1.x, p1.y, p2.x, p2.y, '#000')
+    this.path.draw()
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Paint);
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__canvas__ = __webpack_require__(0);
+
+
+class Line {
+  constructor (x1, y1, x2, y2, colour = '#000', width = 1) {
+    this.x1 = x1
+    this.y1 = y1
+    this.x2 = x2
+    this.y2 = y2
+    this.colour = colour
+    this.width = width
+  }
+
+  draw () {
+    let ctx = __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].getContext()
+
+    // Line style
+    ctx.strokeStyle = this.colour
+    ctx.lineWidth = this.width
+
+    // Draw line
+    ctx.beginPath()
+    ctx.moveTo(x1, y1)
+    ctx.lineTo(x2, y2)
+    ctx.stroke()
+  }
+}
+
+/* unused harmony default export */ var _unused_webpack_default_export = (Line);
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__canvas__ = __webpack_require__(0);
+
+
+class Rect {
+  constructor (x, y, width, height, fillStyle = '#000', lineWidth = 0, strokeStyle = '#000') {
+    this.x = x
+    this.y = y
+    this.width = width
+    this.height = height
+    this.fillStyle = fillStyle
+    this.strokeStyle = strokeStyle,
+    this.lineWidth = lineWidth
+  }
+
+  draw () {
+    const ctx = __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].getContext()
+
+    // Draw filled rect
+    if (__WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].colourVisible(this.fillStyle)) {
+      ctx.fillStyle = this.fillStyle
+      ctx.fillRect(this.x, this.y, this.width, this.height)
+    }
+
+    // Draw stroke
+    if (this.lineWidth > 0) {
+      ctx.strokeStyle = this.strokeStyle
+      ctx.lineWidth = this.lineWidth
+      ctx.strokeRect(this.x, this.y, this.width, this.height)
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Rect);
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__canvas__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__trig__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__path__ = __webpack_require__(6);
+
+
+
+
+// Curved version of a path
+
+class Spline extends __WEBPACK_IMPORTED_MODULE_2__path__["a" /* default */] {
+  constructor(x, y, strokeStyle = '#000', lineWidth = '#000', tension = 0.5) {
+    super(x, y, strokeStyle, lineWidth)
+    this.tension = tension
+    this._controlPoints = []
+  }
+
+  addPoint (x, y) {
+    this.points.push({
+      x: x,
+      y: y
+    })
+    if (this.numPoints > 2) {
+      this._refreshControlPoints()
+    }
+  }
+
+  _calculateControlPoints(p1, p2, p3) {
+    const dx = p3.x - p1.x
+    const dy = p3.y - p1.y
+    const dist1 = __WEBPACK_IMPORTED_MODULE_1__trig__["a" /* default */].distBetween(p1.x, p1.y, p2.x, p2.y)
+    const dist2 = __WEBPACK_IMPORTED_MODULE_1__trig__["a" /* default */].distBetween(p2.x, p2.y, p3.x, p3.y)
+    const distTotal = dist1 + dist2
+
+    // Return two control points
+    return [
+      {
+        x: p2.x - dx * this.tension * dist1 / distTotal,
+        y: p2.y - dy * this.tension * dist1 / distTotal
+      },
+      {
+        x: p2.x + dx * this.tension * dist2 / distTotal,
+        y: p2.y + dy * this.tension * dist2 / distTotal
+      }
+    ]
+  }
+
+  _refreshControlPoints(p1, p2) {
+    this._controlPoints = []
+    for (let i = 0; i < this.numPoints - 2; i++) {
+      const [ cp1, cp2 ] = this._calculateControlPoints(this.points[i], this.points[i+1], this.points[i+2])
+      console.dir(cp1)
+      this._controlPoints.push(cp1, cp2)
+    }
+  }
+
+  _drawSpline () {
+    let ctx = __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].getContext()
+    const numPoints = this.numPoints
+    const pts = this.points
+    const cps = this._controlPoints
+
+    // Draw spline
+    ctx.beginPath()
+    ctx.moveTo(pts[0].x, pts[0].y)
+
+    // First curve is quadratic
+    ctx.quadraticCurveTo(cps[0].x, cps[0].y, pts[1].x, pts[1].y)
+
+    // Connect middle points with bezier
+    let i
+    for (i = 1; i < numPoints - 1; i++) {
+      ctx.bezierCurveTo(
+        cps[(i-1)*2].x, cps[(i-1)*2].y,
+        cps[(i-1)*2+1].x, cps[(i-1)*2+1].y,
+        pts[i].x, pts[i].y
+      )
+    }
+
+    // Last curve is quadratic
+    ctx.quadraticCurveTo(cps[(i-1)*2-1].x, cps[(i-1)*2-1].y, pts[i].x, pts[i].y)
+    ctx.stroke()
+  }
+
+  draw () {
+    if (this.numPoints > 1) {
+      // Only draw if more than 1 point
+      let ctx = __WEBPACK_IMPORTED_MODULE_0__canvas__["a" /* default */].getContext()
+
+      // Line style
+      ctx.strokeStyle = this.strokeStyle
+      ctx.lineWidth = this.lineWidth
+
+      if (this.numPoints === 2) {
+        // Only two points, draw straight line
+        this._drawLine()
+      } else {
+        this._drawSpline()
       }
     }
   }
 }
 
-/* harmony default export */ __webpack_exports__["a"] = (Line);
+/* unused harmony default export */ var _unused_webpack_default_export = (Spline);
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mouse__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__keyboard__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shapes_index__ = __webpack_require__(5);
+
+
+
+
+class MouseTrack {
+  constructor () {
+    this.side = 50
+    this.mainRect = new __WEBPACK_IMPORTED_MODULE_2__shapes_index__["b" /* Rect */](0, 0, this.side, this.side, '#f00', 1)
+    this.clickRect = new __WEBPACK_IMPORTED_MODULE_2__shapes_index__["b" /* Rect */](0, 0, this.side/2, this.side/2, '#0f0')
+    this.spaceRect = new __WEBPACK_IMPORTED_MODULE_2__shapes_index__["b" /* Rect */](0, 0, this.side/2, this.side/2, '#00f')
+
+    this.showClick = false
+    this.showSpace = false
+
+    // Listeners
+    __WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].onLeftDown(() => {
+      this.showClick = true
+    })
+    __WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].onLeftUp(() => {
+      this.showClick = false
+    })
+    __WEBPACK_IMPORTED_MODULE_1__keyboard__["a" /* default */].onKeyDown('space', () => {
+      this.showSpace = true
+    })
+    __WEBPACK_IMPORTED_MODULE_1__keyboard__["a" /* default */].onKeyUp('space', () => {
+      this.showSpace = false
+    })
+  }
+
+  update () {
+    this.mainRect.x = __WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].x - this.side / 2
+    this.mainRect.y = __WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].y - this.side / 2
+    this.clickRect.x = this.mainRect.x
+    this.clickRect.y = this.mainRect.y
+    this.spaceRect.x = __WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].x
+    this.spaceRect.y = __WEBPACK_IMPORTED_MODULE_0__mouse__["a" /* default */].y
+  }
+
+  draw () {
+    this.mainRect.draw()
+    if (this.showClick) {
+      this.clickRect.draw()
+    }
+    if (this.showSpace) {
+      this.spaceRect.draw()
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (MouseTrack);
 
 
 /***/ })
