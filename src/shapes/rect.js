@@ -7,7 +7,7 @@ class Rect {
     this.width = width
     this.height = height
     this.fillStyle = fillStyle
-    this.strokeStyle = strokeStyle,
+    this.strokeStyle = strokeStyle
     this.lineWidth = lineWidth
   }
 

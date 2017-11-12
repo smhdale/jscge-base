@@ -25,7 +25,7 @@ class Paint {
 
   update () {
     if (this.drawing) {
-      let latest = this.getLatestPoint()
+      const latest = this.getLatestPoint()
       if (Trig.distBetween(latest.x, latest.y, Mouse.x, Mouse.y) > this.threshold) {
         this.addPoint()
       }

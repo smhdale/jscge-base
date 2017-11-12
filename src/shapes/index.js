@@ -1,11 +1,11 @@
 import Line from './line'
-import Rect from './rect'
 import Path from './path'
-import Spline from './spline'
+import Rect from './rect'
+import Ellipse from './ellipse'
 
 export {
   Line,
-  Rect,
   Path,
-  Spline
+  Rect,
+  Ellipse
 }
