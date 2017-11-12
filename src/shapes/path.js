@@ -16,19 +16,16 @@ class Path {
   }
 
   addPoint (x, y) {
-    this.points.push({
-      x: x,
-      y: y
-    })
+    this.points.push({ x, y })
   }
 
   _drawLine () {
-    let ctx = Canvas.getContext()
+    const ctx = Canvas.getContext()
 
     ctx.beginPath()
     ctx.moveTo(this.points[0].x, this.points[0].y)
     for (let i = 1; i < this.points.length; i++) {
-      let p = this.points[i]
+      const p = this.points[i]
       ctx.lineTo(p.x, p.y)
     }
     ctx.stroke()
@@ -36,7 +33,7 @@ class Path {
 
   draw () {
     if (this.numPoints > 1) {
-      let ctx = Canvas.getContext()
+      const ctx = Canvas.getContext()
 
       // Line style
       ctx.strokeStyle = this.strokeStyle

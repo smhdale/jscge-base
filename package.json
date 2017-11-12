@@ -10,6 +10,11 @@
   "author": "Samuel Dale",
   "license": "ISC",
   "devDependencies": {
+    "babel-eslint": "^6.1.0",
+    "eslint": "^3.4.0",
+    "eslint-config-esnext": "^1.6.0",
+    "eslint-plugin-babel": "^3.3.0",
+    "eslint-plugin-import": "^1.14.0",
     "keycode": "^2.1.9",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.4"

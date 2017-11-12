@@ -11,7 +11,7 @@ class Line {
   }
 
   draw () {
-    let ctx = Canvas.getContext()
+    const ctx = Canvas.getContext()
 
     // Line style
     ctx.strokeStyle = this.colour
@@ -19,8 +19,8 @@ class Line {
 
     // Draw line
     ctx.beginPath()
-    ctx.moveTo(x1, y1)
-    ctx.lineTo(x2, y2)
+    ctx.moveTo(this.x1, this.y1)
+    ctx.lineTo(this.x2, this.y2)
     ctx.stroke()
   }
 }
