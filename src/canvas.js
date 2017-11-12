@@ -44,6 +44,11 @@ class Canvas {
   clear () {
     this._ctx.clearRect(0, 0, this.width, this.height)
   }
+
+  // Shows or hides mouse
+  setMouseVisibility (visible = true) {
+    this._canvas.style.cursor = (visible ? 'default' : 'none')
+  }
 }
 
 // Singleton class

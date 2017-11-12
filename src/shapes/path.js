@@ -3,7 +3,7 @@ import Canvas from '../canvas'
 // Basically a long line that points can be added to
 
 class Path {
-  constructor (x, y, strokeStyle = '#000', lineWidth = 1) {
+  constructor (x, y, lineWidth = 1, strokeStyle = '#000') {
     this.strokeStyle = strokeStyle
     this.lineWidth = lineWidth
 

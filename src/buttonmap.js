@@ -21,13 +21,13 @@ class jscge_Button {
   // Run all events bound to button up/down
   press () {
     this.down = true
-    for (let fn of this._downEvents) {
+    for (const fn of this._downEvents) {
       fn()
     }
   }
   release () {
     this.down = false
-    for (let fn of this._upEvents) {
+    for (const fn of this._upEvents) {
       fn()
     }
   }
@@ -88,13 +88,13 @@ class jscge_ButtonMap {
 
   // Add a callback event to button press
   _addDownEvent (button, callback) {
-    let b = this._getOrAddButton(button)
+    const b = this._getOrAddButton(button)
     b.addDownEvent(callback)
   }
 
   // Add a callback event to button release
   _addUpEvent (button, callback) {
-    let b = this._getOrAddButton(button)
+    const b = this._getOrAddButton(button)
     b.addUpEvent(callback)
   }
 

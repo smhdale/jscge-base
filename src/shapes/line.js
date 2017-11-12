@@ -1,21 +1,21 @@
 import Canvas from '../canvas'
 
 class Line {
-  constructor (x1, y1, x2, y2, colour = '#000', width = 1) {
+  constructor (x1, y1, x2, y2, lineWidth = 1, strokeStyle = '#000') {
     this.x1 = x1
     this.y1 = y1
     this.x2 = x2
     this.y2 = y2
-    this.colour = colour
-    this.width = width
+    this.strokeStyle = strokeStyle
+    this.lineWidth = lineWidth
   }
 
   draw () {
     const ctx = Canvas.getContext()
 
     // Line style
-    ctx.strokeStyle = this.colour
-    ctx.lineWidth = this.width
+    ctx.strokeStyle = this.strokeStyle
+    ctx.lineWidth = this.lineWidth
 
     // Draw line
     ctx.beginPath()
