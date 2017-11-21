@@ -2,7 +2,7 @@ import Mouse from '../mouse'
 import Trig from '../trig'
 import { Path } from '../shapes/index'
 
-class Paint {
+export default class Paint {
   constructor () {
     // Props
     this.path = new Path(Mouse.x, Mouse.y)
@@ -36,5 +36,3 @@ class Paint {
     this.path.draw()
   }
 }
-
-export default Paint

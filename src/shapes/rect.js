@@ -1,6 +1,6 @@
 import Canvas from '../canvas'
 
-class Rect {
+export default class Rect {
   constructor (x, y, width, height, fillStyle = '#000', lineWidth = 0, strokeStyle = '#000') {
     this.x = x
     this.y = y
@@ -28,5 +28,3 @@ class Rect {
     }
   }
 }
-
-export default Rect

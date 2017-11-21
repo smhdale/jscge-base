@@ -1,6 +1,6 @@
 import Canvas from '../canvas'
 
-class Line {
+export default class Line {
   constructor (x1, y1, x2, y2, lineWidth = 1, strokeStyle = '#000') {
     this.x1 = x1
     this.y1 = y1
@@ -24,5 +24,3 @@ class Line {
     ctx.stroke()
   }
 }
-
-export default Line

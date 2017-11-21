@@ -2,7 +2,7 @@ import Canvas from '../canvas'
 
 // Basically a long line that points can be added to
 
-class Polygon {
+export default class Polygon {
   constructor (x, y, points, fillStyle = '#000', lineWidth = 1, strokeStyle = '#000') {
     // Error checking
     if (!Array.isArray(points)) {
@@ -62,5 +62,3 @@ class Polygon {
     }
   }
 }
-
-export default Polygon

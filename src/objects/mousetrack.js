@@ -3,9 +3,7 @@ import Keyboard from '../keyboard'
 import Trig from '../trig'
 import { Rect, Ellipse, Polygon } from '../shapes/index'
 
-// Wang Yu Wei
-
-class MouseTracker {
+export default class MouseTracker {
   constructor () {
     const side = 100
     this.side = side
@@ -61,5 +59,3 @@ class MouseTracker {
     this.mainRect.draw()
   }
 }
-
-export default MouseTracker

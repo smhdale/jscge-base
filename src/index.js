@@ -4,19 +4,31 @@ import GameClock from './dt'
 import Mouse from './mouse'
 import Keyboard from './keyboard'
 
-// Instance imports
+// Object imports
 import Paint from './objects/paint'
 import MouseTrack from './objects/mousetrack'
+import ExpandingCircle from './objects/expandingcircle'
 
 let lines = []
+const circles = []
 const mouseTracker = new MouseTrack()
 
 // Hide mouse
 Canvas.setMouseVisibility(false)
+let cx = 0
+let cy = 0
 
 // Draw
 Mouse.onLeftDown(() => {
   lines.push(new Paint())
+  cx = Mouse.x
+  cy = Mouse.y
+})
+
+Mouse.onLeftUp(() => {
+  if (Mouse.x === cx && Mouse.y === cy) {
+    circles.push(new ExpandingCircle())
+  }
 })
 
 // Undo
@@ -35,6 +47,10 @@ function update () {
     line.update()
   }
 
+  for (const circle of circles) {
+    circle.update()
+  }
+
   mouseTracker.update()
 
   draw()
@@ -46,6 +62,10 @@ function draw () {
   //InstanceManager.drawAll()
   for (const line of lines) {
     line.draw()
+  }
+
+  for (const circle of circles) {
+    circle.draw()
   }
 
   mouseTracker.draw()

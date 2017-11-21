@@ -1,6 +1,6 @@
 import Canvas from '../canvas'
 
-class Ellipse {
+export default class Ellipse {
   constructor (x, y, radiusX, radiusY, fillStyle = '#000', lineWidth = 0, strokeStyle = '#000') {
     this.x = x
     this.y = y
@@ -12,8 +12,8 @@ class Ellipse {
 
     // Angle properties
     this.rotation = 0
-    this.startAngle = 0;
-    this.endAngle = 2 * Math.PI;
+    this.startAngle = 0
+    this.endAngle = 2 * Math.PI
   }
 
   draw () {
@@ -37,5 +37,3 @@ class Ellipse {
     }
   }
 }
-
-export default Ellipse
